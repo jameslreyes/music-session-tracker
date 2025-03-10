@@ -5,6 +5,7 @@ import { AppError } from '../middleware/error';
 
 export const settingsController = {
   get: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    console.log('settingsController --> get() --> Getting settings');
     try {
       // First try to get all settings ordered by creation date
       const { data: allSettings, error: fetchError } = await supabase
@@ -16,6 +17,7 @@ export const settingsController = {
 
       // If no settings exist, create default settings
       if (!allSettings || allSettings.length === 0) {
+        console.log('settingsController --> get() --> No settings found, creating defaults');
         const defaultSettings = {
           default_hourly_rate: 100,
           round_to_nearest: 15,
@@ -29,18 +31,22 @@ export const settingsController = {
           .single();
 
         if (createError) throw new AppError(createError.message, 500);
+        console.log(`settingsController --> get() --> Created default settings:\n${JSON.stringify(newSettings, null, 2)}`);
         res.json(newSettings);
         return;
       }
 
       // If settings exist, return the most recent one
+      console.log(`settingsController --> get() --> Found existing settings:\n${JSON.stringify(allSettings, null, 2)}`);
       res.json(allSettings[0]);
     } catch (err) {
+      console.error(`settingsController --> get() --> Error getting settings: ${err}`);
       next(err);
     }
   },
 
   update: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    console.log(`settingsController --> update() --> Updating settings: ${JSON.stringify(req.body, null, 2)}`);
     try {
       const updates: Partial<Settings> = req.body;
 
@@ -63,8 +69,10 @@ export const settingsController = {
         .single();
 
       if (error) throw new AppError(error.message, 500);
+      console.log(`settingsController --> update() --> Updated settings:\n${JSON.stringify(data, null, 2)}`);
       res.json(data);
     } catch (err) {
+      console.error(`settingsController --> update() --> Error updating settings: ${err}`);
       next(err);
     }
   },
