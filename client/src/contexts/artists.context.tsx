@@ -6,6 +6,7 @@ import { artistsApi } from '@/lib/api';
 interface ArtistsContextType {
   artists: Artist[];
   isLoading: boolean;
+  isSaving: boolean;
   error: Error | null;
   createArtist: (artist: Partial<Artist>) => Promise<void>;
   updateArtist: (id: string, updates: Partial<Artist>) => Promise<void>;
@@ -18,6 +19,7 @@ const ArtistsContext = createContext<ArtistsContextType | null>(null);
 export function ArtistsProvider({ children }: { children: ReactNode }) {
   const [artists, setArtists] = useState<Artist[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   const loadArtists = useCallback(async () => {
@@ -36,7 +38,7 @@ export function ArtistsProvider({ children }: { children: ReactNode }) {
 
   const createArtist = useCallback(async (artist: Partial<Artist>) => {
     try {
-      setIsLoading(true);
+      setIsSaving(true);
       setError(null);
       const newArtist = await artistsApi.create(artist);
       setArtists(prev => [...prev, newArtist]);
@@ -46,13 +48,13 @@ export function ArtistsProvider({ children }: { children: ReactNode }) {
       toast.error('Failed to create artist');
       throw err;
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   }, []);
 
   const updateArtist = useCallback(async (id: string, updates: Partial<Artist>) => {
     try {
-      setIsLoading(true);
+      setIsSaving(true);
       setError(null);
       const updatedArtist = await artistsApi.update(id, updates);
       setArtists(prev => prev.map(artist =>
@@ -64,13 +66,13 @@ export function ArtistsProvider({ children }: { children: ReactNode }) {
       toast.error('Failed to update artist');
       throw err;
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   }, []);
 
   const deleteArtist = useCallback(async (id: string) => {
     try {
-      setIsLoading(true);
+      setIsSaving(true);
       setError(null);
       await artistsApi.delete(id);
       setArtists(prev => prev.filter(artist => artist.id !== id));
@@ -80,7 +82,7 @@ export function ArtistsProvider({ children }: { children: ReactNode }) {
       toast.error('Failed to delete artist');
       throw err;
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   }, []);
 
@@ -93,6 +95,7 @@ export function ArtistsProvider({ children }: { children: ReactNode }) {
       value={{
         artists,
         isLoading,
+        isSaving,
         error,
         createArtist,
         updateArtist,
