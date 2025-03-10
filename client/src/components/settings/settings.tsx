@@ -4,7 +4,7 @@ import { useSettings } from '@/contexts/settings.context';
 import { SettingsForm } from './settings-form';
 
 export function Settings() {
-  const { settings, isLoading, error, updateSettings } = useSettings();
+  const { settings, isLoading, isSaving, error, updateSettings } = useSettings();
 
   if (isLoading) {
     return (
@@ -41,7 +41,11 @@ export function Settings() {
           <CardTitle>Application Settings</CardTitle>
         </CardHeader>
         <CardContent>
-          <SettingsForm settings={settings} onSubmit={updateSettings} />
+          <SettingsForm
+            settings={settings}
+            onSubmit={updateSettings}
+            isSaving={isSaving}
+          />
         </CardContent>
       </Card>
     </div>

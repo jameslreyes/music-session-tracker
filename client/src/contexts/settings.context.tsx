@@ -6,6 +6,7 @@ import { settingsApi } from '@/lib/api';
 interface SettingsContextType {
   settings: Settings | null;
   isLoading: boolean;
+  isSaving: boolean;
   error: Error | null;
   updateSettings: (updates: Partial<Settings>) => Promise<void>;
   refreshSettings: () => Promise<void>;
@@ -16,6 +17,7 @@ const SettingsContext = createContext<SettingsContextType | null>(null);
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   const loadSettings = useCallback(async () => {
@@ -34,7 +36,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   const updateSettings = useCallback(async (updates: Partial<Settings>) => {
     try {
-      setIsLoading(true);
+      setIsSaving(true);
       setError(null);
       const updatedSettings = await settingsApi.update(updates);
       setSettings(updatedSettings);
@@ -44,7 +46,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       toast.error('Failed to update settings');
       throw err;
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   }, []);
 
@@ -57,6 +59,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       value={{
         settings,
         isLoading,
+        isSaving,
         error,
         updateSettings,
         refreshSettings: loadSettings,

@@ -46,7 +46,7 @@ export const settingsController = {
   },
 
   update: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    console.log(`settingsController --> update() --> Updating settings: ${JSON.stringify(req.body, null, 2)}`);
+    console.log(`settingsController --> update() --> Updating settings:\n${JSON.stringify(req.body, null, 2)}`);
     try {
       const updates: Partial<Settings> = req.body;
 
