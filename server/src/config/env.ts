@@ -2,6 +2,13 @@ import dotenv from 'dotenv';
 import { Environment } from '../types';
 dotenv.config();
 
+export const requiredEnvVars = [
+  'PORT',
+  'NODE_ENV',
+  'SUPABASE_URL',
+  'SUPABASE_SERVICE_ROLE_KEY',
+]
+
 export const env: Environment = {
   port: process.env.PORT ? parseInt(process.env.PORT) : 3000,
   nodeEnv: process.env.NODE_ENV || 'development',
@@ -9,27 +16,14 @@ export const env: Environment = {
   supabaseKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
 }
 
-export const validateEnv = async (env: Environment): Promise<boolean> => {
-  const missingFields = [];
-
-  if (!env.supabaseUrl) {
-    missingFields.push('SUPABASE_URL');
-  }
-  if (!env.supabaseKey) {
-    missingFields.push('SUPABASE_SERVICE_ROLE_KEY');
-  }
-  if (!env.port) {
-    missingFields.push('PORT');
-  }
-  if (!env.nodeEnv) {
-    missingFields.push('NODE_ENV');
-  }
+export const validateEnv = async (requiredEnvVars: string[]): Promise<boolean> => {
+  const missingFields = requiredEnvVars.filter((envVar => !process.env[envVar]));
 
   if (missingFields.length > 0) {
-    console.error('Missing required environment variables:', missingFields.join(', '));
+    console.error(`config/env.ts --> validateEnv() --> Missing required environment variables:\n${missingFields.join('\n')}`);
     return false;
   }
 
-  console.success('All environment variables validated successfully');
+  console.success('config/env.ts --> validateEnv() --> All environment variables validated successfully');
   return true;
 }

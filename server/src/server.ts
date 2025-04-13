@@ -1,14 +1,10 @@
 import { setupCustomLogging } from './config/logger';
-import { env, validateEnv } from './config/env';
+import { env, requiredEnvVars, validateEnv } from './config/env';
 setupCustomLogging(env.nodeEnv === 'development');
 import app from './app';
 
 
 app.listen(env.port, async () => {
-  const isValid = await validateEnv(env);
-  if (!isValid) {
-    console.error('Environment variables validation failed');
-    process.exit(1);
-  }
-  console.log(`Server is running on port ${env.port}`);
+  if (!await validateEnv(requiredEnvVars)) process.exit(1);
+  console.info(`server.ts --> app.listen() --> Server is running on port [${env.port}]`);
 });

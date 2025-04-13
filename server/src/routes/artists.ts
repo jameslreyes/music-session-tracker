@@ -7,9 +7,9 @@ import { z } from 'zod';
 const router = Router();
 
 router.get('/', artistsController.getAll);
-router.get('/:id', validate(z.object({ params: artistSchema.params })), artistsController.getById);
-router.post('/', validate(z.object({ body: artistSchema.body })), artistsController.create);
-router.put('/:id', validate(z.object({ params: artistSchema.params, body: artistSchema.body })), artistsController.update);
-router.delete('/:id', validate(z.object({ params: artistSchema.params })), artistsController.delete);
+router.get('/:id', validate(artistSchema.params), artistsController.getById);
+router.post('/', validate(artistSchema.body), artistsController.create);
+router.put('/:id', validate(artistSchema.params), validate(artistSchema.body), artistsController.update);
+router.delete('/:id', validate(artistSchema.params), artistsController.delete);
 
-export default router; 
+export default router;
